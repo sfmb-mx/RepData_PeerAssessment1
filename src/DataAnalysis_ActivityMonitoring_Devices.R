@@ -7,9 +7,9 @@
 ## Created: Wed Oct 15 07:22:12 2014 (-0500)
 ## Version: 
 ## Package-Requires: ()
-## Last-Updated: Thu Oct 16 08:43:13 2014 (-0500)
+## Last-Updated: Thu Oct 16 11:22:55 2014 (-0500)
 ##           By: Sergio-Feliciano Mendoza-Barrera
-##     Update #: 136
+##     Update #: 179
 ## URL: 
 ## Doc URL: 
 ## Keywords: 
@@ -88,27 +88,26 @@ deviceData <- read.table("../data/activity.csv", sep = ",", header = TRUE)
 deviceData <- transform(deviceData, date = as.Date(date, format = "%Y-%m-%d"))
 
 ## Using data table class in order to improve the speed
-dd.dt <- data.table(deviceData)
+## dd.dt <- data.table(deviceData)
 
 ## Delete data frames not needed
-rm(deviceData)
+## rm(deviceData)
 
 #######################
 ## Summary help code ##
-head(dd.dt)
-summary(dd.dt)
-print(head(dd.dt))
-anyNA(dd.dt$date)
-anyNA(dd.dt$steps)
-anyNA(dd.dt$interval)
+head(deviceData)
+summary(deviceData)
+print(head(deviceData))
+anyNA(deviceData$date)
+anyNA(deviceData$steps)
+anyNA(deviceData$interval)
 #######################
 
 ######################################################################
 ## What is mean total number of steps taken per day?
 
 ## Calculating the number of steps per date:
-stepsPerDay <- aggregate(dd.dt$steps, list(dd.dt$date), FUN = "sum")
-
+stepsPerDay <- aggregate(deviceData$steps, list(deviceData$date), FUN = "sum")
 colnames(stepsPerDay) <- c("date", "steps")
 
 ## The histogram si showed below,
@@ -143,28 +142,58 @@ medianLabel <- paste("Median =", medianTotalStepsPerDay, sep = " ")
 
 ## The histogram si showed below, now with the mean and median.
 g <- ggplot(stepsPerDay, aes(x = date, y = steps))
-
 xrng <- stepsPerDay$date
 
 p <- g + geom_bar(stat="identity", position="identity") +
     geom_hline(aes(yintercept = meanTotalStepsPerDay),
-               colour = alpha("#990000", 0.5), linetype="dashed") +
+               colour = alpha("dark red", 0.5), linetype="dashed") +
     geom_hline(aes(yintercept = medianTotalStepsPerDay),
-               colour = alpha("blue", 0.5), linetype="dashed") +
+               colour = alpha("red", 0.5), linetype="dashed") +
     labs(x = "Date [date]") +
     labs(y = expression("Steps taken per day")) +
     labs(title = "Steps taken per date") +
     geom_text(data=NULL, aes(x = xrng[26],  y = 17500,
-              label = meanLabel), colour = alpha("#990000", 0.25),
+              label = meanLabel), colour = alpha("dark red", 0.25),
               size=4, hjust = 0, vjust = 0) +
     geom_text(data=NULL, aes(x = xrng[26],  y = 16500,
-              label = medianLabel), colour = alpha("blue", 0.25),
+              label = medianLabel), colour = alpha("red", 0.25),
               size=4, hjust = 0, vjust = 0)
 
 print(p)
+graphics.off()                          # help command
 
+######################################################################
+## What is the average daily activity pattern?
 
+## Calculating the average number of steps per date per time interval:
 
+bad <- is.na(deviceData[, 1])
+completeDeviceData <- deviceData[!bad, ]
+
+intervalStepsPerDay <- aggregate(completeDeviceData$steps,
+                                 list(completeDeviceData$interval),
+                                 FUN = "mean")
+colnames(intervalStepsPerDay) <- c("interval", "steps")
+
+## The maximum number of steps for all intervals.
+highest <- subset(intervalStepsPerDay, steps == max(steps))
+maximumStepsLabel <- paste("Maximum: Steps =", highest$steps, ":",
+                           "Interval =", highest$interval)
+## Ploting the results
+g <- ggplot(intervalStepsPerDay, aes(x = interval, y = steps))
+p <- g + geom_point(color = "dark red") +
+  geom_line(color = "dark red") +
+    labs(x = "5 minutes interval [Minutes]") + 
+    labs(y =
+             expression("Average number of steps per interval across all days [Steps]")) +
+    labs(title =
+             " Average number of steps per interval across all days [Steps]") +
+    geom_point(data = highest, size = 3, colour = alpha("green", 0.5)) +
+    geom_text(data=NULL, aes(x = 835,  y = 210,
+    label = maximumStepsLabel), colour = alpha("dark red", 0.25),
+    size=4, hjust = 0, vjust = 0)
+
+print(p)
 graphics.off()                          # help command
 
 ######################################################################
