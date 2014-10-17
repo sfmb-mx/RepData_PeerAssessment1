@@ -7,9 +7,9 @@
 ## Created: Wed Oct 15 07:22:12 2014 (-0500)
 ## Version: 
 ## Package-Requires: ()
-## Last-Updated: Thu Oct 16 11:22:55 2014 (-0500)
+## Last-Updated: Thu Oct 16 21:21:37 2014 (-0500)
 ##           By: Sergio-Feliciano Mendoza-Barrera
-##     Update #: 179
+##     Update #: 263
 ## URL: 
 ## Doc URL: 
 ## Keywords: 
@@ -60,7 +60,7 @@
 ## 
 ### Code:
 rm(list = ls())                         # Remove all workspace data
-library(data.table)
+## library(data.table)
 library(plyr)
 library(ggplot2)
 library(parallel)
@@ -87,22 +87,6 @@ deviceData <- read.table("../data/activity.csv", sep = ",", header = TRUE)
 ## in an easy way
 deviceData <- transform(deviceData, date = as.Date(date, format = "%Y-%m-%d"))
 
-## Using data table class in order to improve the speed
-## dd.dt <- data.table(deviceData)
-
-## Delete data frames not needed
-## rm(deviceData)
-
-#######################
-## Summary help code ##
-head(deviceData)
-summary(deviceData)
-print(head(deviceData))
-anyNA(deviceData$date)
-anyNA(deviceData$steps)
-anyNA(deviceData$interval)
-#######################
-
 ######################################################################
 ## What is mean total number of steps taken per day?
 
@@ -119,16 +103,10 @@ p <- g + geom_bar(stat="identity", position="identity") +
         labs(title = "Steps taken per date")
 
 print(p)
-
+invisible(readline(prompt="Press [enter] to continue"))
 graphics.off()                          # help command
-#######################
-## Summary help code ##
-summary(stepsPerDay)
-dim(stepsPerDay)
-anyNA(stepsPerDay)
 
-#######################
-
+######################################################################
 ## Calculate the mean and median of the total number of the steps taken
 ## each day.
 
@@ -160,6 +138,7 @@ p <- g + geom_bar(stat="identity", position="identity") +
               size=4, hjust = 0, vjust = 0)
 
 print(p)
+invisible(readline(prompt="Press [enter] to continue"))
 graphics.off()                          # help command
 
 ######################################################################
@@ -194,6 +173,71 @@ p <- g + geom_point(color = "dark red") +
     size=4, hjust = 0, vjust = 0)
 
 print(p)
+invisible(readline(prompt="Press [enter] to continue"))
+graphics.off()                          # help command
+
+## 1. Calculate and report the total number of missing values in the
+## dataset (i.e. the total number of rows with `NA`s)
+
+numberRowsWithNA <- nrow(deviceData[!complete.cases(deviceData), ])
+
+######################################################################
+## 2. Devise a strategy for filling in all of the missing values in
+## the dataset. The strategy does not need to be sophisticated. For
+## example, you could use the mean/median for that day, or the mean
+## for that 5-minute interval, etc.
+
+## Explain the strategy.
+
+## 3. Create a new dataset that is equal to the original dataset but
+## with the missing data filled in.
+
+newDeviceData <- deviceData
+
+for (i in 1:nrow(newDeviceData)) {
+    if (is.na(newDeviceData[i, 1])) {
+        interval <- newDeviceData[i, 3]
+        newDeviceData[i, 1] <- intervalStepsPerDay[intervalStepsPerDay$interval == interval, 2]
+    }
+}
+
+## anyNA(newDeviceData$steps)
+
+######################################################################
+## 4. Make a histogram of the total number of steps taken each day and
+## Calculate and report the **mean** and **median** total number of
+## steps taken per day. Do these values differ from the estimates from
+## the first part of the assignment? What is the impact of imputing
+## missing data on the estimates of the total daily number of steps?
+## The histogram si showed below, now with the mean and median.
+
+## Calculating the number of steps per date:
+newStepsPerDay <- aggregate(newDeviceData$steps, list(newDeviceData$date), FUN = "sum")
+colnames(newStepsPerDay) <- c("date", "steps")
+
+## The histogram si showed below,
+
+g <- ggplot(newStepsPerDay, aes(x = date, y = steps))
+xrng <- newStepsPerDay$date
+
+p <- g + geom_bar(stat="identity", position="identity") +
+    geom_hline(aes(yintercept = meanTotalStepsPerDay),
+               colour = alpha("dark red", 0.5), linetype="dashed") +
+    geom_hline(aes(yintercept = medianTotalStepsPerDay),
+               colour = alpha("red", 0.5), linetype="dashed") +
+    labs(x = "Date [date]") +
+    labs(y = expression("Steps taken per day")) +
+    labs(title = "Steps taken per date") +
+    geom_text(data=NULL, aes(x = xrng[26],  y = 17500,
+              label = meanLabel), colour = alpha("dark red", 0.25),
+              size=4, hjust = 0, vjust = 0) +
+    geom_text(data=NULL, aes(x = xrng[26],  y = 16500,
+              label = medianLabel), colour = alpha("red", 0.25),
+              size=4, hjust = 0, vjust = 0)
+
+
+print(p)
+invisible(readline(prompt="Press [enter] to continue"))
 graphics.off()                          # help command
 
 ######################################################################
