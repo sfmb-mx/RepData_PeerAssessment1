@@ -7,9 +7,9 @@
 ## Created: Wed Oct 15 07:22:12 2014 (-0500)
 ## Version: 
 ## Package-Requires: ()
-## Last-Updated: Thu Oct 16 21:21:37 2014 (-0500)
+## Last-Updated: Fri Oct 17 18:27:25 2014 (-0500)
 ##           By: Sergio-Feliciano Mendoza-Barrera
-##     Update #: 263
+##     Update #: 293
 ## URL: 
 ## Doc URL: 
 ## Keywords: 
@@ -60,11 +60,11 @@
 ## 
 ### Code:
 rm(list = ls())                         # Remove all workspace data
-## library(data.table)
 library(plyr)
 library(ggplot2)
 library(parallel)
 library(scales)
+library(timeDate)
 
 ## Directory structure creation
 if(!file.exists("../data")) {
@@ -98,9 +98,9 @@ colnames(stepsPerDay) <- c("date", "steps")
 g <- ggplot(stepsPerDay, aes(x = date, y = steps))
 
 p <- g + geom_bar(stat="identity", position="identity") +
-        labs(x = "Date [date]") +
-        labs(y = expression("Steps taken per day")) +
-        labs(title = "Steps taken per date")
+    labs(x = "Date [date]") +
+    labs(y = expression("Steps taken per day")) +
+    labs(title = "Steps taken per date")
 
 print(p)
 invisible(readline(prompt="Press [enter] to continue"))
@@ -195,10 +195,11 @@ numberRowsWithNA <- nrow(deviceData[!complete.cases(deviceData), ])
 newDeviceData <- deviceData
 
 for (i in 1:nrow(newDeviceData)) {
-    if (is.na(newDeviceData[i, 1])) {
-        interval <- newDeviceData[i, 3]
-        newDeviceData[i, 1] <- intervalStepsPerDay[intervalStepsPerDay$interval == interval, 2]
-    }
+        if (is.na(newDeviceData[i, 1])) {
+                interval <- newDeviceData[i, 3]
+                newDeviceData[i, 1] <-
+                        intervalStepsPerDay[intervalStepsPerDay$interval == interval, 2]
+        }
 }
 
 ## anyNA(newDeviceData$steps)
@@ -223,22 +224,53 @@ xrng <- newStepsPerDay$date
 p <- g + geom_bar(stat="identity", position="identity") +
     geom_hline(aes(yintercept = meanTotalStepsPerDay),
                colour = alpha("dark red", 0.5), linetype="dashed") +
-    geom_hline(aes(yintercept = medianTotalStepsPerDay),
-               colour = alpha("red", 0.5), linetype="dashed") +
-    labs(x = "Date [date]") +
-    labs(y = expression("Steps taken per day")) +
-    labs(title = "Steps taken per date") +
-    geom_text(data=NULL, aes(x = xrng[26],  y = 17500,
-              label = meanLabel), colour = alpha("dark red", 0.25),
-              size=4, hjust = 0, vjust = 0) +
-    geom_text(data=NULL, aes(x = xrng[26],  y = 16500,
-              label = medianLabel), colour = alpha("red", 0.25),
-              size=4, hjust = 0, vjust = 0)
+                   geom_hline(aes(yintercept = medianTotalStepsPerDay),
+                   colour = alpha("red", 0.5), linetype="dashed") +
+                   labs(x = "Date [date]") +
+                   labs(y = expression("Steps taken per day")) +
+                   labs(title = "Steps taken per date") +
+                   geom_text(data=NULL,
+                   aes(x = xrng[26],  y = 17500,
+                   label = meanLabel), colour = alpha("dark red", 0.25),
+                   size=4, hjust = 0, vjust = 0) +
+                   geom_text(data=NULL, aes(x = xrng[26],  y = 16500,
+                   label = medianLabel), colour = alpha("red", 0.25),
+                   size=4, hjust = 0, vjust = 0)
 
 
 print(p)
 invisible(readline(prompt="Press [enter] to continue"))
 graphics.off()                          # help command
+
+## Are there differences in activity patterns between weekdays and weekends?
+
+## For this part the `weekdays()` function may be of some help here. Use
+## the dataset with the filled-in missing values for this part.
+
+## 1. Create a new factor variable in the dataset with two levels --
+## "weekday" and "weekend" indicating whether a given date is a
+## weekday or weekend day.
+
+for (i in 1:nrow(newDeviceData)) {
+        if (isWeekend(as.Date(newDeviceData[i, 2]))) {
+                dayLevel[i] <- "weekend"
+        } else {
+                dayLevel[i] <- "weekday"
+        }
+}
+
+dayLevel <- factor(dayLevel, order=TRUE, levels=c("weekday",
+                                             "weekend"))
+newDeviceData <- cbind(newDeviceData, dayLevel)
+
+class(newDeviceData$dayLevel)
+
+## 2. Make a panel plot containing a time series plot (i.e. `type =
+## "l"`) of the 5-minute interval (x-axis) and the average number of
+## steps taken, averaged across all weekday days or weekend days
+## (y-axis). The plot should look something like the following, which
+## was created using **simulated data**
+
 
 ######################################################################
 ### DataAnalysis_ActivityMonitoring_Devices.R ends here
