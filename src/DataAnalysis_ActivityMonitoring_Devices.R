@@ -7,9 +7,9 @@
 ## Created: Wed Oct 15 07:22:12 2014 (-0500)
 ## Version: 
 ## Package-Requires: ()
-## Last-Updated: Fri Oct 17 18:27:25 2014 (-0500)
+## Last-Updated: Fri Oct 17 19:45:54 2014 (-0500)
 ##           By: Sergio-Feliciano Mendoza-Barrera
-##     Update #: 293
+##     Update #: 323
 ## URL: 
 ## Doc URL: 
 ## Keywords: 
@@ -124,17 +124,17 @@ xrng <- stepsPerDay$date
 
 p <- g + geom_bar(stat="identity", position="identity") +
     geom_hline(aes(yintercept = meanTotalStepsPerDay),
-               colour = alpha("dark red", 0.5), linetype="dashed") +
+               colour = "dark red", linetype="dashed") +
     geom_hline(aes(yintercept = medianTotalStepsPerDay),
-               colour = alpha("red", 0.5), linetype="dashed") +
+               colour = "red", linetype="dashed") +
     labs(x = "Date [date]") +
     labs(y = expression("Steps taken per day")) +
     labs(title = "Steps taken per date") +
     geom_text(data=NULL, aes(x = xrng[26],  y = 17500,
-              label = meanLabel), colour = alpha("dark red", 0.25),
+              label = meanLabel), colour = "dark red",
               size=4, hjust = 0, vjust = 0) +
     geom_text(data=NULL, aes(x = xrng[26],  y = 16500,
-              label = medianLabel), colour = alpha("red", 0.25),
+              label = medianLabel), colour = "red",
               size=4, hjust = 0, vjust = 0)
 
 print(p)
@@ -167,9 +167,9 @@ p <- g + geom_point(color = "dark red") +
              expression("Average number of steps per interval across all days [Steps]")) +
     labs(title =
              " Average number of steps per interval across all days [Steps]") +
-    geom_point(data = highest, size = 3, colour = alpha("green", 0.5)) +
+    geom_point(data = highest, size = 3, colour = "green") +
     geom_text(data=NULL, aes(x = 835,  y = 210,
-    label = maximumStepsLabel), colour = alpha("dark red", 0.25),
+    label = maximumStepsLabel), colour = "dark red",
     size=4, hjust = 0, vjust = 0)
 
 print(p)
@@ -223,18 +223,18 @@ xrng <- newStepsPerDay$date
 
 p <- g + geom_bar(stat="identity", position="identity") +
     geom_hline(aes(yintercept = meanTotalStepsPerDay),
-               colour = alpha("dark red", 0.5), linetype="dashed") +
+               colour = "dark red", linetype="dashed") +
                    geom_hline(aes(yintercept = medianTotalStepsPerDay),
-                   colour = alpha("red", 0.5), linetype="dashed") +
+                   colour = "red", linetype="dashed") +
                    labs(x = "Date [date]") +
                    labs(y = expression("Steps taken per day")) +
                    labs(title = "Steps taken per date") +
                    geom_text(data=NULL,
                    aes(x = xrng[26],  y = 17500,
-                   label = meanLabel), colour = alpha("dark red", 0.25),
+                   label = meanLabel), colour = "dark red",
                    size=4, hjust = 0, vjust = 0) +
                    geom_text(data=NULL, aes(x = xrng[26],  y = 16500,
-                   label = medianLabel), colour = alpha("red", 0.25),
+                   label = medianLabel), colour = "red",
                    size=4, hjust = 0, vjust = 0)
 
 
@@ -251,6 +251,8 @@ graphics.off()                          # help command
 ## "weekday" and "weekend" indicating whether a given date is a
 ## weekday or weekend day.
 
+dayLevel <- character(length = nrow(newDeviceData))
+
 for (i in 1:nrow(newDeviceData)) {
         if (isWeekend(as.Date(newDeviceData[i, 2]))) {
                 dayLevel[i] <- "weekend"
@@ -263,7 +265,7 @@ dayLevel <- factor(dayLevel, order=TRUE, levels=c("weekday",
                                              "weekend"))
 newDeviceData <- cbind(newDeviceData, dayLevel)
 
-class(newDeviceData$dayLevel)
+print(summary(newDeviceData))
 
 ## 2. Make a panel plot containing a time series plot (i.e. `type =
 ## "l"`) of the 5-minute interval (x-axis) and the average number of
@@ -271,6 +273,30 @@ class(newDeviceData$dayLevel)
 ## (y-axis). The plot should look something like the following, which
 ## was created using **simulated data**
 
+newIntervalStepsPerDay <- aggregate(newDeviceData$steps,
+                                    by = list(newDeviceData$interval,
+                                         newDeviceData$dayLevel), FUN
+                                    = "mean")
+colnames(newIntervalStepsPerDay) <- c("interval", "dayLevel", "steps")
+
+## Ploting the number of steps taken, averaged across all weekday days or
+## weekend days.
+
+g <- qplot(interval, steps, data = newIntervalStepsPerDay, facets =
+          dayLevel ~ .)
+p <- g + geom_point(color = "dark red") +
+    geom_line(color = "dark red") +
+    labs(x = "5 minutes interval [Minutes]") + 
+    labs(y =
+    expression("Average number of steps per interval across all days [Steps]")) +
+    labs(title =
+             " Average number of steps per interval across all days per day type")
+
+print(p)
+invisible(readline(prompt="Press [enter] to continue"))
+graphics.off()                          # help command
+
+print("***    DONE    ***")
 
 ######################################################################
 ### DataAnalysis_ActivityMonitoring_Devices.R ends here
