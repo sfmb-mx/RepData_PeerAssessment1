@@ -1,3 +1,64 @@
+# Peer Assessment 1 : Reproducible research #
+
+In order to have a logical tree files the report in all the formats
+are in the reports directory.
+
+Te complete tree is showed below:
+
+`
+.
+├── README
+├── README.md
+├── TODO
+├── cache
+├── config
+│   └── global.dcf
+├── data
+│   ├── activity.csv
+│   └── activity.zip
+├── diagnostics
+│   └── 1.R
+├── doc
+│   ├── instructions.pdf
+│   └── instructions_fig
+│       └── sample_panelplot.png
+├── graphs
+│   ├── dayLevelUse-1.png
+│   ├── histNewStepsPerDay-1.png
+│   ├── histStepsPerDay-1.png
+│   ├── histStepsPerDayWMM-1.png
+│   ├── unnamed-chunk-7-1.png
+│   ├── unnamed-chunk-8-1.png
+│   └── unnamed-chunk-9-1.png
+├── lib
+│   └── helpers.R
+├── logs
+├── munge
+│   └── 01-A.R
+├── profiling
+│   └── 1.R
+├── reports
+│   ├── PA1_template.Rmd
+│   ├── PA1_template.html
+│   ├── PA1_template.md
+│   ├── compileRmdReport.R
+│   └── figure
+│       ├── dayLevelUse-1.png
+│       ├── histNewStepsPerDay-1.png
+│       ├── histStepsPerDay-1.png
+│       ├── histStepsPerDayWMM-1.png
+│       ├── unnamed-chunk-7-1.png
+│       ├── unnamed-chunk-8-1.png
+│       └── unnamed-chunk-9-1.png
+├── src
+│   ├── DataAnalysis_ActivityMonitoring_Devices.R
+│   └── eda.R
+└── tests
+    └── 1.R
+
+15 directories, 33 files
+`
+
 ## Introduction
 
 It is now possible to collect a large amount of data about personal
@@ -124,7 +185,7 @@ the dataset with the filled-in missing values for this part.
 
 1. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using **simulated data**:
 
-![Sample panel plot](instructions_fig/sample_panelplot.png) 
+![Sample panel plot](instructions_fig/sample_panelplot.png)
 
 
 **Your plot will look different from the one above** because you will

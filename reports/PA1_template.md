@@ -9,19 +9,13 @@ output:
 
 ## 1. Loading and preprocessing the data
 
-```{r, libraries,echo=FALSE}
-rm(list = ls())                         # Remove all workspace data
-library(plyr)
-library(ggplot2)
-library(parallel)
-library(scales)
-library(timeDate)
-```
+
 
 Reading device data in csv format, in this case the read.csv() method was
 used for the appropriate data source.
 
-```{r, loadData}
+
+```r
 deviceData <- read.table("../data/activity.csv", sep = ",", header = TRUE)
 ```
 
@@ -29,13 +23,22 @@ deviceData <- read.table("../data/activity.csv", sep = ",", header = TRUE)
 was factor, then the conversion will allow us to manipulate dates
 in an easy way,
 
-```{r}
+
+```r
 deviceData <- transform(deviceData, date = as.Date(date, format = "%Y-%m-%d"))
 ```
 The summary of the data set is
 
-```{r, echo = FALSE}
-summary(deviceData)
+
+```
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304
 ```
 
 ### Answer. The data frame now is ready to make the next steps of the analysis. ###
@@ -45,14 +48,16 @@ summary(deviceData)
 In order to answer this question we need to add the number of steps
 for each day. We proceed to calculate the number of steps per date:
 
-```{r}
+
+```r
 stepsPerDay <- aggregate(deviceData$steps, list(deviceData$date), FUN = "sum")
 colnames(stepsPerDay) <- c("date", "steps")
 ```
 
 The code and the histogram is showed below,
 
-```{r histStepsPerDay}
+
+```r
 g <- ggplot(stepsPerDay, aes(x = date, y = steps))
 
 p <- g + geom_bar(stat="identity", position="identity") +
@@ -63,10 +68,13 @@ p <- g + geom_bar(stat="identity", position="identity") +
 print(p)
 ```
 
+![plot of chunk histStepsPerDay](figure/histStepsPerDay-1.png) 
+
 Calculating the mean and median of the total number of the steps taken
 each day. The mean of the total number of the steps taken each day is
 
-```{r}
+
+```r
 meanTotalStepsPerDay <- mean(stepsPerDay$steps, na.rm = TRUE)
 meanLabel <- paste("Mean =", meanTotalStepsPerDay, sep = " ")
 ```
@@ -74,16 +82,18 @@ meanLabel <- paste("Mean =", meanTotalStepsPerDay, sep = " ")
 The median of the total number of the steps sttaken each day is
 calculated with
 
-```{r}
+
+```r
 medianTotalStepsPerDay <- median(stepsPerDay$steps, na.rm = TRUE)
 medianLabel <- paste("Median =", medianTotalStepsPerDay, sep = " ")
 ```
 
-### Answer: The mean total number of steps taken per day is `r meanTotalStepsPerDay`. And the median total number of steps taken per day is `r medianTotalStepsPerDay`.###
+### Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the median total number of steps taken per day is 10765.###
 
 The histogram si showed below, now with the mean and median.
 
-```{r, histStepsPerDayWMM}
+
+```r
 g <- ggplot(stepsPerDay, aes(x = date, y = steps))
 xrng <- stepsPerDay$date
 
@@ -105,13 +115,16 @@ p <- g + geom_bar(stat="identity", position="identity") +
 print(p)
 ```
 
+![plot of chunk histStepsPerDayWMM](figure/histStepsPerDayWMM-1.png) 
+
 ## 3. What is the average daily activity pattern? ##
 
 The average number of steps per date per time interval can
 be calculated avoiding the NA values, then, we can calculate the mean
 per day for each interval
 
-```{r}
+
+```r
 bad <- is.na(deviceData[, 1])
 completeDeviceData <- deviceData[!bad, ]
 
@@ -123,7 +136,8 @@ colnames(intervalStepsPerDay) <- c("interval", "steps")
 
 Calculating the maximum number of steps for all intervals.
 
-```{r}
+
+```r
 highest <- subset(intervalStepsPerDay, steps == max(steps))
 maximumStepsLabel <- paste("Maximum: Steps =", highest$steps, ":",
                            "Interval =", highest$interval)
@@ -131,7 +145,8 @@ maximumStepsLabel <- paste("Maximum: Steps =", highest$steps, ":",
 
 Plotting the results
 
-```{r}
+
+```r
 g <- ggplot(intervalStepsPerDay, aes(x = interval, y = steps))
 p <- g + geom_point(color = "dark red") +
   geom_line(color = "dark red") +
@@ -148,19 +163,22 @@ p <- g + geom_point(color = "dark red") +
 print(p)
 ```
 
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
+
 ### Answer: The pattern present in the average daily activity have a big quantity of steps at the interval between 750 and 1000 minutes, after that time is reduced in a half. ###
 
-### The maximum value is (`r highest`). ###
+### The maximum value is (835, 206.1698113). ###
 
 ## 4. Imputing missing values
 
-1. Calculate and report the total nThe maximum value is (`r highest`).umber of missing values in the
+1. Calculate and report the total nThe maximum value is (835, 206.1698113).umber of missing values in the
    dataset (i.e. the total number of rows with `NA`)
 
-```{r, numberOfNA}
+
+```r
 numberRowsWithNA <- nrow(deviceData[!complete.cases(deviceData), ])
 ```
-The number of NA values in the steps field is `r numberRowsWithNA`
+The number of NA values in the steps field is 2304
 
 2. Devise a strategy for filling in all of the missing values in
 the dataset. The strategy does not need to be sophisticated. For
@@ -172,7 +190,8 @@ for that 5-minute interval, etc.
 3. Create a new dataset that is equal to the original dataset but
 with the missing data filled in.
 
-```{r, newDataSet}
+
+```r
 newDeviceData <- deviceData
 
 for (i in 1:nrow(newDeviceData)) {
@@ -193,7 +212,8 @@ The histogram si showed below, now with the mean and median.
 
 Calculating the number of steps per date:
 
-```{r}
+
+```r
 newStepsPerDay <- aggregate(newDeviceData$steps, list(newDeviceData$date), FUN = "sum")
 colnames(newStepsPerDay) <- c("date", "steps")
 ```
@@ -201,7 +221,8 @@ colnames(newStepsPerDay) <- c("date", "steps")
 Calculating the mean and median of the total number of the steps taken
 each day. The mean of the total number of the steps taken each day is
 
-```{r}
+
+```r
 newMeanTotalStepsPerDay <- mean(newStepsPerDay$steps, na.rm = TRUE)
 meanLabel <- paste("Mean =", newMeanTotalStepsPerDay, sep = " ")
 ```
@@ -209,16 +230,18 @@ meanLabel <- paste("Mean =", newMeanTotalStepsPerDay, sep = " ")
 The median of the total number of the steps sttaken each day is
 calculated with
 
-```{r}
+
+```r
 newMedianTotalStepsPerDay <- median(newStepsPerDay$steps, na.rm = TRUE)
 medianLabel <- paste("Median =", newMedianTotalStepsPerDay, sep = " ")
 ```
 
-### Answer: The mean total number of steps taken per day is `r newMeanTotalStepsPerDay`. And the median total number of steps taken per day is `r newMedianTotalStepsPerDay`.###
+### Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the median total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>.###
 
 The histogram si showed below,
 
-```{r, histNewStepsPerDay}
+
+```r
 g <- ggplot(newStepsPerDay, aes(x = date, y = steps))
 xrng <- newStepsPerDay$date
 
@@ -242,6 +265,8 @@ p <- g + geom_bar(stat="identity", position="identity") +
 print(p)
 ```
 
+![plot of chunk histNewStepsPerDay](figure/histNewStepsPerDay-1.png) 
+
 ### Answer: Now we have a better approximation when we make a substitution of NA values with the mean of each interval for each day in general the median and the mean are the same, the imputing missing data actions didn't have impact in calculations ###
 
 ## 5. Are there differences in activity patterns between weekdays and weekends?
@@ -253,7 +278,8 @@ the dataset with the filled-in missing values for this part.
 **weekday** and **weekend** indicating whether a given date is a
  weekday or weekend day.
 
-```{r}
+
+```r
 dayLevel <- character(length = nrow(newDeviceData))
 
 for (i in 1:nrow(newDeviceData)) {
@@ -271,13 +297,24 @@ newDeviceData <- cbind(newDeviceData, dayLevel)
 print(summary(newDeviceData))
 ```
 
+```
+##      steps             date               interval         dayLevel    
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0   weekday:12960  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8   weekend: 4608  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5                  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5                  
+##  3rd Qu.: 27.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2                  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0
+```
+
 2. Make a panel plot containing a time series plot (i.e. `type =
 "l"`) of the 5-minute interval (x-axis) and the average number of
 steps taken, averaged across all weekday days or weekend days
 (y-axis). The plot should look something like the following, which
 was created using **simulated data**
 
-```{r}
+
+```r
 newIntervalStepsPerDay <- aggregate(newDeviceData$steps,
                                     by = list(newDeviceData$interval,
                                          newDeviceData$dayLevel), FUN
@@ -288,7 +325,8 @@ colnames(newIntervalStepsPerDay) <- c("interval", "dayLevel", "steps")
 Plotting the number of steps taken, averaged across all weekday days or
 weekend days.
 
-```{r, dayLevelUse}
+
+```r
 g <- qplot(interval, steps, data = newIntervalStepsPerDay, facets =
           dayLevel ~ .)
 p <- g + geom_point(color = "dark red") +
@@ -301,5 +339,7 @@ p <- g + geom_point(color = "dark red") +
 
 print(p)
 ```
+
+![plot of chunk dayLevelUse](figure/dayLevelUse-1.png) 
 
 ### Answer. The average number of steps per interval is lower at weekends. In the same way, at weekends the raising in the number of steps begin later than in weekdays, and, in general at weekends, the number of steps are compressed in less intervals, beginning later and finish earlier. ###
