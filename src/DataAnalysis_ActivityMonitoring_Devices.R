@@ -7,9 +7,9 @@
 ## Created: Wed Oct 15 07:22:12 2014 (-0500)
 ## Version: 
 ## Package-Requires: ()
-## Last-Updated: Fri Oct 17 19:45:54 2014 (-0500)
+## Last-Updated: Sat Oct 18 08:13:52 2014 (-0500)
 ##           By: Sergio-Feliciano Mendoza-Barrera
-##     Update #: 323
+##     Update #: 326
 ## URL: 
 ## Doc URL: 
 ## Keywords: 
@@ -216,15 +216,21 @@ for (i in 1:nrow(newDeviceData)) {
 newStepsPerDay <- aggregate(newDeviceData$steps, list(newDeviceData$date), FUN = "sum")
 colnames(newStepsPerDay) <- c("date", "steps")
 
+newMeanTotalStepsPerDay <- mean(newStepsPerDay$steps, na.rm = TRUE)
+meanLabel <- paste("Mean =", newMeanTotalStepsPerDay, sep = " ")
+
+newMedianTotalStepsPerDay <- median(newStepsPerDay$steps, na.rm = TRUE)
+medianLabel <- paste("Median =", newMedianTotalStepsPerDay, sep = " ")
+
 ## The histogram si showed below,
 
 g <- ggplot(newStepsPerDay, aes(x = date, y = steps))
 xrng <- newStepsPerDay$date
 
 p <- g + geom_bar(stat="identity", position="identity") +
-    geom_hline(aes(yintercept = meanTotalStepsPerDay),
+    geom_hline(aes(yintercept = newMeanTotalStepsPerDay),
                colour = "dark red", linetype="dashed") +
-                   geom_hline(aes(yintercept = medianTotalStepsPerDay),
+                   geom_hline(aes(yintercept = newMedianTotalStepsPerDay),
                    colour = "red", linetype="dashed") +
                    labs(x = "Date [date]") +
                    labs(y = expression("Steps taken per day")) +
@@ -236,7 +242,6 @@ p <- g + geom_bar(stat="identity", position="identity") +
                    geom_text(data=NULL, aes(x = xrng[26],  y = 16500,
                    label = medianLabel), colour = "red",
                    size=4, hjust = 0, vjust = 0)
-
 
 print(p)
 invisible(readline(prompt="Press [enter] to continue"))

@@ -5,14 +5,13 @@ output:
     keep_md: true
 ---
 
-**Sergio-Feliciano Mendoza-Barrera Oct. 17, 2014**
-
 ## 1. Loading and preprocessing the data
 
 
 
-Reading device data in csv format, in this case the read.csv() method was
-used for the appropriate data source.
+### Reading device data in csv format and formatting the data frame ###
+
+In this case the read.csv() method was used for the appropriate data source.
 
 
 ```r
@@ -41,12 +40,16 @@ The summary of the data set is
 ##  NA's   :2304
 ```
 
-### Answer. The data frame now is ready to make the next steps of the analysis. ###
+**Answer. The data frame now is ready to make the next steps of the analysis.**
+
+
+----------
 
 ## 2. What is mean total number of steps taken per day?
 
 In order to answer this question we need to add the number of steps
-for each day. We proceed to calculate the number of steps per date:
+for each day. We proceed to calculate the number of steps per date
+using the aggregate function in R.
 
 
 ```r
@@ -54,33 +57,17 @@ stepsPerDay <- aggregate(deviceData$steps, list(deviceData$date), FUN = "sum")
 colnames(stepsPerDay) <- c("date", "steps")
 ```
 
-The code and the histogram is showed below,
-
-
-```r
-g <- ggplot(stepsPerDay, aes(x = date, y = steps))
-
-p <- g + geom_bar(stat="identity", position="identity") +
-    labs(x = "Date [date]") +
-    labs(y = expression("Steps taken per day")) +
-    labs(title = "Steps taken per date")
-
-print(p)
-```
-
-![plot of chunk histStepsPerDay](figure/histStepsPerDay-1.png) 
-
 Calculating the mean and median of the total number of the steps taken
-each day. The mean of the total number of the steps taken each day is
+each day.
 
 
 ```r
 meanTotalStepsPerDay <- mean(stepsPerDay$steps, na.rm = TRUE)
 meanLabel <- paste("Mean =", meanTotalStepsPerDay, sep = " ")
 ```
-
-The median of the total number of the steps sttaken each day is
-calculated with
+The mean of the total number of the steps taken each day is 1.0766189 &times; 10<sup>4</sup>.
+In other hand, the median of the total number of the steps taken each
+day can be calculated with
 
 
 ```r
@@ -88,9 +75,9 @@ medianTotalStepsPerDay <- median(stepsPerDay$steps, na.rm = TRUE)
 medianLabel <- paste("Median =", medianTotalStepsPerDay, sep = " ")
 ```
 
-### Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the median total number of steps taken per day is 10765.###
-
-The histogram si showed below, now with the mean and median.
+The median of the total number of the steps taken each day equal to
+10765. The histogram si showed below, now with
+the mean and median.
 
 
 ```r
@@ -117,11 +104,17 @@ print(p)
 
 ![plot of chunk histStepsPerDayWMM](figure/histStepsPerDayWMM-1.png) 
 
+**Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>.
+And the median total number of steps taken per day is 10765.**
+
+----------
+
 ## 3. What is the average daily activity pattern? ##
 
 The average number of steps per date per time interval can
 be calculated avoiding the NA values, then, we can calculate the mean
-per day for each interval
+per day for each interval, the following code subset the cases where
+the steps field of the data frame have a value different of `NA`.
 
 
 ```r
@@ -150,7 +143,7 @@ Plotting the results
 g <- ggplot(intervalStepsPerDay, aes(x = interval, y = steps))
 p <- g + geom_point(color = "dark red") +
   geom_line(color = "dark red") +
-    labs(x = "5 minutes interval [Minutes]") +
+    labs(x = "interval = 5 [Minutes]") +
     labs(y =
              expression("Average number of steps per interval across all days [Steps]")) +
     labs(title =
@@ -165,30 +158,42 @@ print(p)
 
 ![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
 
-### Answer: The pattern present in the average daily activity have a big quantity of steps at the interval between 750 and 1000 minutes, after that time is reduced in a half. ###
+The summary of the steps taken per day per interval is
 
-### The maximum value is (835, 206.1698113). ###
+
+```
+##     interval          steps        
+##  Min.   :   0.0   Min.   :  0.000  
+##  1st Qu.: 588.8   1st Qu.:  2.486  
+##  Median :1177.5   Median : 34.113  
+##  Mean   :1177.5   Mean   : 37.383  
+##  3rd Qu.:1766.2   3rd Qu.: 52.835  
+##  Max.   :2355.0   Max.   :206.170
+```
+
+**Answer: The pattern present in the average daily activity have a big
+  quantity of steps at the interval between 750 and 1000 minutes,
+  after that time is reduced in a half. With the The maximum value at
+  (835, 206.1698113).**
+
+----------
 
 ## 4. Imputing missing values
 
-1. Calculate and report the total nThe maximum value is (835, 206.1698113).umber of missing values in the
-   dataset (i.e. the total number of rows with `NA`)
+We can calculate and report the total number of missing values in the
+dataset (i.e. the total number of rows with `NA`)
 
 
 ```r
 numberRowsWithNA <- nrow(deviceData[!complete.cases(deviceData), ])
 ```
-The number of NA values in the steps field is 2304
 
-2. Devise a strategy for filling in all of the missing values in
-the dataset. The strategy does not need to be sophisticated. For
-example, you could use the mean/median for that day, or the mean
-for that 5-minute interval, etc.
+**The number of NA values in the steps field is 2304.**
 
-### The selected strategy was substitute each NA value with mean for the specific interval of the row. ###
-
-3. Create a new dataset that is equal to the original dataset but
-with the missing data filled in.
+Now, we can design an strategy in order to substitute the `NA` values
+with the mean for the 5-minute interval. A new data set was create but
+with the missing data filled in with the filling and substitute
+process strategy.
 
 
 ```r
@@ -203,14 +208,8 @@ for (i in 1:nrow(newDeviceData)) {
 }
 ```
 
-4. Make an histogram of the total number of steps taken each day and
-calculate and report the **mean** and **median** total number of
-steps taken per day. Do these values differ from the estimates from
-the first part of the assignment? What is the impact of imputing
-missing data on the estimates of the total daily number of steps?
-
 The histogram si showed below, now with the mean and
-median. Calculating the number of steps per date:
+median. Calculating the number of steps per date
 
 
 ```r
@@ -219,13 +218,15 @@ colnames(newStepsPerDay) <- c("date", "steps")
 ```
 
 Calculating the mean and median of the total number of the steps taken
-each day. The mean of the total number of the steps taken each day is
+each day.
 
 
 ```r
 newMeanTotalStepsPerDay <- mean(newStepsPerDay$steps, na.rm = TRUE)
 meanLabel <- paste("Mean =", newMeanTotalStepsPerDay, sep = " ")
 ```
+
+The mean of the total number of the steps taken each day is 1.0766189 &times; 10<sup>4</sup>.
 
 The median of the total number of the steps sttaken each day is
 calculated with
@@ -236,7 +237,7 @@ newMedianTotalStepsPerDay <- median(newStepsPerDay$steps, na.rm = TRUE)
 medianLabel <- paste("Median =", newMedianTotalStepsPerDay, sep = " ")
 ```
 
-### Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the median total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the values are very close each other respectively, the impact of the substitution is minimal. ###
+The mean of the total number of the steps taken each day is 1.0766189 &times; 10<sup>4</sup>.
 
 The histogram si showed below,
 
@@ -267,16 +268,20 @@ print(p)
 
 ![plot of chunk histNewStepsPerDay](figure/histNewStepsPerDay-1.png) 
 
-### Answer: Now we have a better approximation when we make a substitution of NA values with the mean of each interval for each day in general the median and the mean are the same, the imputing missing data actions didn't have impact in calculations ###
+**The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>.
+And the median total number of steps taken
+  per day is 1.0766189 &times; 10<sup>4</sup>. Actually, the values are very
+  close to the case with `NA` respectively, the impact of the substitution is
+  minimal. The imputing missing data actions didn't have impact in
+  calculations.**
+
+----------
 
 ## 5. Are there differences in activity patterns between weekdays and weekends?
 
-For this part the `weekdays()` function may be of some help here. And using
-the dataset with the filled-in missing values for this part.
-
-1. Create a new factor variable in the dataset with two levels
+We create a new factor variable in the dataset with two levels
 **weekday** and **weekend** indicating whether a given date is a
- weekday or weekend day.
+weekday or weekend day.
 
 
 ```r
@@ -293,9 +298,10 @@ for (i in 1:nrow(newDeviceData)) {
 dayLevel <- factor(dayLevel, order=TRUE, levels=c("weekday",
                                              "weekend"))
 newDeviceData <- cbind(newDeviceData, dayLevel)
-
-print(summary(newDeviceData))
 ```
+
+The new data frame summary is
+
 
 ```
 ##      steps             date               interval         dayLevel    
@@ -307,11 +313,11 @@ print(summary(newDeviceData))
 ##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0
 ```
 
-2. Make a panel plot containing a time series plot (i.e. `type =
-"l"`) of the 5-minute interval (x-axis) and the average number of
-steps taken, averaged across all weekday days or weekend days
-(y-axis). The plot should look something like the following, which
-was created using **simulated data**
+A panel plot with a time series for the 5-minute interval (x-axis) and
+the average number of steps taken averaged across all weekday or
+weekend days (y-axis) is required, then we proceed to process the
+steps taken data averaging it respect to the 5-minute interval and the
+different ("weekday and weekend") levels
 
 
 ```r
@@ -342,4 +348,29 @@ print(p)
 
 ![plot of chunk dayLevelUse](figure/dayLevelUse-1.png) 
 
-### Answer. The average number of steps per interval is lower at weekends. In the same way, at weekends the raising in the number of steps begin later than in weekdays, and, in general at weekends, the number of steps are compressed in less intervals, beginning later and finish earlier. ###
+The summary of the new data frame is
+
+
+```
+##     interval         dayLevel       steps        
+##  Min.   :   0.0   weekday:288   Min.   :  0.000  
+##  1st Qu.: 588.8   weekend:288   1st Qu.:  2.047  
+##  Median :1177.5                 Median : 28.133  
+##  Mean   :1177.5                 Mean   : 38.988  
+##  3rd Qu.:1766.2                 3rd Qu.: 61.263  
+##  Max.   :2355.0                 Max.   :230.378
+```
+
+**The average number of steps per interval is lower at
+  weekends. In the same way, at weekends the raising in the number of
+  steps begin later than in weekdays, and, in general at weekends, the
+  number of steps are compressed in less intervals, beginning later
+  and finish earlier.**
+
+
+*******
+
+`Coded in Emacs24 + ESS + Polymode + Markdown modes. Sergio-Feliciano
+Mendoza-Barrera Oct. 17, 2014`
+
+<!-- EOF -->
