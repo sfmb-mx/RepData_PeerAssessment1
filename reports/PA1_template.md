@@ -208,9 +208,9 @@ calculate and report the **mean** and **median** total number of
 steps taken per day. Do these values differ from the estimates from
 the first part of the assignment? What is the impact of imputing
 missing data on the estimates of the total daily number of steps?
-The histogram si showed below, now with the mean and median.
 
-Calculating the number of steps per date:
+The histogram si showed below, now with the mean and
+median. Calculating the number of steps per date:
 
 
 ```r
@@ -236,7 +236,7 @@ newMedianTotalStepsPerDay <- median(newStepsPerDay$steps, na.rm = TRUE)
 medianLabel <- paste("Median =", newMedianTotalStepsPerDay, sep = " ")
 ```
 
-### Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the median total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>.###
+### Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the median total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the values are very close each other respectively, the impact of the substitution is minimal. ###
 
 The histogram si showed below,
 

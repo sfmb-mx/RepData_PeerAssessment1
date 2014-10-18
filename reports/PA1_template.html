@@ -384,11 +384,11 @@ for (i in 1:nrow(newDeviceData)) {
 calculate and report the <strong>mean</strong> and <strong>median</strong> total number of
 steps taken per day. Do these values differ from the estimates from
 the first part of the assignment? What is the impact of imputing
-missing data on the estimates of the total daily number of steps?
-The histogram si showed below, now with the mean and median.</li>
+missing data on the estimates of the total daily number of steps?</li>
 </ol>
 
-<p>Calculating the number of steps per date:</p>
+<p>The histogram si showed below, now with the mean and
+median. Calculating the number of steps per date:</p>
 
 <pre><code class="r">newStepsPerDay &lt;- aggregate(newDeviceData$steps, list(newDeviceData$date), FUN = &quot;sum&quot;)
 colnames(newStepsPerDay) &lt;- c(&quot;date&quot;, &quot;steps&quot;)
@@ -408,7 +408,7 @@ calculated with</p>
 medianLabel &lt;- paste(&quot;Median =&quot;, newMedianTotalStepsPerDay, sep = &quot; &quot;)
 </code></pre>
 
-<h3>Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the median total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>.</h3>
+<h3>Answer: The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the median total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>. And the values are very close each other respectively, the impact of the substitution is minimal.</h3>
 
 <p>The histogram si showed below,</p>
 
