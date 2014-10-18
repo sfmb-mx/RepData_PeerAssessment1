@@ -3,9 +3,12 @@
 In order to have a logical tree files the report in all the formats
 are in the reports directory.
 
+**The best way to see the report at github is visit the
+  PA1_template.md file**
+
 Te complete tree is showed below:
 
-`
+<pre><code>
 .
 ├── README
 ├── README.md
@@ -40,7 +43,7 @@ Te complete tree is showed below:
 ├── reports
 │   ├── PA1_template.Rmd
 │   ├── PA1_template.html
-│   ├── PA1_template.md
+│   ├── PA1_template.md        <--- This report include images
 │   ├── compileRmdReport.R
 │   └── figure
 │       ├── dayLevelUse-1.png
@@ -57,7 +60,7 @@ Te complete tree is showed below:
     └── 1.R
 
 15 directories, 33 files
-`
+</code></pre>
 
 ## Introduction
 
